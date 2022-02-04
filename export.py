@@ -7,6 +7,7 @@ import html2text
 import markdown
 from bs4 import BeautifulSoup
 from datetime import datetime
+from html import escape as htmlescape
 from operator import itemgetter
 from download_posts import download_posts
 from download_comments import download_comments
@@ -129,7 +130,7 @@ def comment_to_li(comment):
     html += '\n<a id="comment-{0}"></a>'.format(comment['id'])
 
     if 'body' in comment:
-        html += '\n' + markdown.markdown(TAGLESS_NEWLINES.sub('<br>\n', comment['body']))
+        html += '\n' + markdown.markdown(TAGLESS_NEWLINES.sub('<br>\n', htmlescape(comment['body'])))
 
     if len(comment['children']) > 0:
         html += '\n' + comments_to_html(comment['children'])
