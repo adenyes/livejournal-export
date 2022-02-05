@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import click
 import json
 import os
 import re
@@ -206,8 +207,58 @@ def combine(all_posts, all_comments):
         save_as_markdown(id, subfolder, json_post, post_comments_html)
 
 
-if __name__ == "__main__":
-    if True:
+def year_options(func):
+    return click.option(
+        "--year_start",
+        "-ys",
+        help="first 4 digit year to include entries from. e.g. 1998",
+        type=click.INT,
+        default=2000,
+    )(
+        click.option(
+            "--year_end",
+            "-ye",
+            help="first 4 digit year to exclude entries from. e.g. 2023",
+            type=click.INT,
+            default=2023,
+        )(func)
+    )
+
+@click.group()
+def main():
+    pass
+
+
+@main.group()
+def download():
+    """ Download some data from LJ
+    """
+    pass
+
+
+@download.command()
+def comments():
+    download_comments()
+
+
+@download.command()
+@year_options
+def posts(year_start: int, year_end: int):
+    download_posts(year_start, year_end)
+
+
+@main.command()
+@year_options
+@click.option(
+    "--skip_download",
+    "-s",
+    help="Do not download from livejournal, process already downloaded files.",
+    is_flag=True,
+)
+def export(year_start: int, year_end: int, skip_download: bool):
+    """ Download and export data
+    """
+    if not skip_download:
         all_posts = download_posts()
         all_comments = download_comments()
 
@@ -218,3 +269,7 @@ if __name__ == "__main__":
             all_comments = json.load(f)
 
     combine(all_posts, all_comments)
+
+
+if __name__ == "__main__":
+    main()

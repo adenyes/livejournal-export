@@ -6,10 +6,6 @@ import requests
 import xml.etree.ElementTree as ET
 from auth import cookies, headers
 
-
-YEARS = range(2003, 2015)  # first to (last + 1)
-
-
 def fetch_month_posts(year, month):
     response = requests.post(
         "https://www.livejournal.com/export_do.bml",
@@ -53,12 +49,12 @@ def xml_to_json(xml):
     }
 
 
-def download_posts():
+def download_posts(year_start: int, year_end: int):
     os.makedirs("posts-xml", exist_ok=True)
     os.makedirs("posts-json", exist_ok=True)
 
     xml_posts = []
-    for year in YEARS:
+    for year in range(year_start, year_end):
         for month in range(1, 13):
             xml = fetch_month_posts(year, month)
             xml_posts.extend(list(ET.fromstring(xml).iter("entry")))
@@ -76,4 +72,4 @@ def download_posts():
 
 
 if __name__ == "__main__":
-    download_posts()
+    download_posts(2003, 2015)
