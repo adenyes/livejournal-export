@@ -10,16 +10,18 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from html import escape as htmlescape
 from operator import itemgetter
+
+import auth
 from download_posts import download_posts
 from download_comments import download_comments
 
-
 TAG = re.compile(r"\[!\[(.*?)\]\(http:\/\/utx.ambience.ru\/img\/.*?\)\]\(.*?\)")
 USER = re.compile(r'<lj user="?(.*?)"?>')
-TAGLESS_NEWLINES = re.compile("(?<!>)\n")
-NEWLINES = re.compile("(\s*\n){3,}")
+TAGLESS_NEWLINES = re.compile(r"(?<!>)\n")
+NEWLINES = re.compile(r"(\s*\n){3,}")
 
 SLUGS = {}
+
 
 # TODO: lj-cut
 
@@ -224,15 +226,20 @@ def year_options(func):
         )(func)
     )
 
+
 @click.group()
 def main():
     pass
 
 
+@main.command()
+def logout():
+    auth.clean_lj_session_cookies()
+
+
 @main.group()
 def download():
-    """ Download some data from LJ
-    """
+    """Download some data from LJ"""
     pass
 
 
@@ -256,10 +263,9 @@ def posts(year_start: int, year_end: int):
     is_flag=True,
 )
 def export(year_start: int, year_end: int, skip_download: bool):
-    """ Download and export data
-    """
+    """Download and export data"""
     if not skip_download:
-        all_posts = download_posts()
+        all_posts = download_posts(year_start, year_end)
         all_comments = download_comments()
 
     else:

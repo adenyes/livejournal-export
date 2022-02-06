@@ -2,15 +2,14 @@
 
 import json
 import os
-import requests
 import xml.etree.ElementTree as ET
-from auth import cookies, headers
+from auth import login
+
 
 def fetch_month_posts(year, month):
-    response = requests.post(
+    session = login()
+    response = session.post(
         "https://www.livejournal.com/export_do.bml",
-        headers=headers,
-        cookies=cookies,
         data={
             "what": "journal",
             "year": year,

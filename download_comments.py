@@ -2,17 +2,14 @@
 
 import os
 import json
-import requests
 import xml.etree.ElementTree as ET
-from auth import cookies, headers
+from auth import login
 
 
 def fetch_xml(params):
-    response = requests.get(
-        "https://www.livejournal.com/export_comments.bml",
-        params=params,
-        headers=headers,
-        cookies=cookies,
+    session = login()
+    response = session.get(
+        "https://www.livejournal.com/export_comments.bml", params=params
     )
 
     return response.text
